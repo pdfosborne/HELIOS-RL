@@ -1,2 +1,2 @@
-# HELIOS-RL
-The homepage of applying the HELIOS framework to Reinforcement Learning problems. 
+# HELIOS
+Hierarchical &amp; Explainable agents using Language Instructions Over Symbolics
