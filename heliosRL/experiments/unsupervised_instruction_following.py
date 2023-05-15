@@ -31,7 +31,7 @@ from heliosRL.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
 # -> instruction following approach then becomes alternative form of this file to be called instead
 # -> TODO: This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalise naming for this
 
-class UNSUPERVISED_SEARCH():
+class UnsupervisedSearch():
     def __init__(self,Config:dict, LocalConfig:dict, Environment, 
                  number_exploration_episodes:int = 100, sim_threshold:float = 0.9,
                  observed_states:dict=None, instruction_results:dict=None):

@@ -32,7 +32,7 @@ PLAYER_PARAMS = {
 # -> instruction following approach then becomes alternative form of this file to be called instead
 # -> DONE: This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalize naming for this
 
-class EXPERIMENT:
+class Experiment:
     """This is the standard Reinforcement Learning experiment setup for a flat agent. 
     - The agent is trained for a fixed number of episodes
     - Then learning is fixed to be applied during testing phase
