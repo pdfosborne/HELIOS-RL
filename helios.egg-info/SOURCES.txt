@@ -5,6 +5,7 @@ helios/__init__.py
 helios/analysis.py
 helios/config.py
 helios/config_local.py
+helios/import_test.py
 helios.egg-info/PKG-INFO
 helios.egg-info/SOURCES.txt
 helios.egg-info/dependency_links.txt

@@ -1,8 +1,9 @@
 Metadata-Version: 2.1
-Name: helios
+Name: heliosRL
 Version: 0.1
-Summary: XXX
-Home-page: 
+Summary: Applying the HELIOS architecture to Reinforcement Learning problems.
+Home-page: https://github.com/pdfosborne/HELIOS-RL
 Author: Philip Osborne
-Author-email: XXX
+Author-email: pdfosborne@gmail.com
+License: GNU Public License v3
 License-File: LICENSE
