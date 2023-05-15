@@ -2,9 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from itertools import cycle
 
-import glob
 import os
 
 import warnings
