@@ -19,6 +19,7 @@ from helios.agents.agent_abstract import Agent, QLearningAgent
 from helios.agents.table_q_agent import TableQLearningAgent
 from helios.agents.neural_q_agent import NeuralQLearningAgent
 
+# TODO: Enable any number of the same agent types with varying parameters
 AGENT_TYPES = {
     "Qlearntab": TableQLearningAgent,
     "Neural_Q": NeuralQLearningAgent,
@@ -37,10 +38,10 @@ PLAYER_PARAMS = {
 # Defines the train/test operators and imports all the required agents and experiment functions ready to be used
 # The local main.py file defines the [adapters, configs, environment] to be input
 
-# TODO: This should be where the environment is initialized and then episode_loop (or train/test) is run
+# This should be where the environment is initialized and then episode_loop (or train/test) is run
 # -> results then passed down to experiment to produce visual reporting (staticmethod)
 # -> instruction following approach then becomes alternative form of this file to be called instead
-# -> TODO: This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalise naming for this
+# -> This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalise naming for this
 
 class HELIOS_OPTIMIZE:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, 
@@ -136,8 +137,8 @@ class HELIOS_OPTIMIZE:
             seed_results_connection = {}
             for seed_num in range(0,self.num_training_seeds):
                 if self.num_training_seeds > 1:
-                        print("------")
-                        print("- Seed Num: ", seed_num)
+                    print("------")
+                    print("- Seed Num: ", seed_num)
                 # -------------------------------------------------------------------------------
                 # Initialise Environment
                 # Environment now init here and called directly in experimental setup loop

@@ -12,5 +12,12 @@ class StateAdapter(ABC):
         # Read the data.
         # fill in the feature fields
         raise NotImplementedError
+    
+    def adapter(self):
+        "Returns the adapted form, may require input flag for encoded or non-encoded output."
+        
+        
+    def sample(self):
+        """Returns a sample of an adapted state form (typically inital positiion of the environment)."""
 
         

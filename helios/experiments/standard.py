@@ -43,6 +43,12 @@ PLAYER_PARAMS = {
 # -> DONE: This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalize naming for this
 
 class EXPERIMENT:
+    """This is the standard Reinforcement Learning experiment setup for a flat agent. 
+    - The agent is trained for a fixed number of episodes
+    - Then learning is fixed to be applied during testing phase
+    - Repeats (or seeds if environment start position changes) are used for statistical significant testing
+    - Experience Sampling stores observed episodes into a sampled MDP model to learn from to improve training efficiency
+    """
     def __init__(self, Config:dict, LocalConfig:dict, Environment, save_dir:str, show_figures:str, window_size:float):
         self.ExperimentConfig = Config
         self.LocalConfig = LocalConfig
@@ -91,6 +97,9 @@ class EXPERIMENT:
             seed_recall = {}
             seed_results_connection = {}
             for seed_num in range(0,self.num_training_seeds):
+                if self.num_training_seeds > 1:
+                    print("------")
+                    print("- Seed Num: ", seed_num)
                 # -------------------------------------------------------------------------------
                 # Initialise Environment
                 # Environment now init here and called directly in experimental setup loop
@@ -106,8 +115,9 @@ class EXPERIMENT:
                 # ---
                 setup_num:int = 0
                 for training_repeat in range(1,number_training_repeats+1):
-                    print("------")
-                    print("- Repeat Num: ", training_repeat)
+                    if number_training_repeats > 1:
+                        print("------")
+                        print("- Repeat Num: ", training_repeat)
                     setup_num+=1
                     
                     # ----- init agent

@@ -21,9 +21,12 @@ class LanguageEncoder(StateEncoder):
         self.sentence_model: SentenceTransformer = SentenceTransformer('all-MiniLM-L6-v2', device=self.device)
         
 
-    def encode(self, state: List[str]) -> Tensor:
+    def encode(self, state: List[str], legal_actions:list = None, episode_action_history:list = None, 
+               indexed: bool = False) -> Tensor:
         if (len(state) == 0):
             state = [""]
+        if type(state) != type(list(str)):
+            state = list(state)
             
         to_encode = [sent for sent in state if sent not in LanguageEncoder._cached_enc]
         if (to_encode):

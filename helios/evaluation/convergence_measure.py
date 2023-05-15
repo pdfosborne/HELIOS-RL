@@ -13,58 +13,6 @@ class Convergence_Measure:
         # Ploy display time
         self.display_plot_time = 10
 
-    # Analyse repeat results & pick best agent that has converged
-    # - Not going to be fast but is shouldn't cause huge issues
-    # - Need to check for convergence as well, best might not be stable
-    # conv_measure = Convergence_Measure(self.ExperimentConfig["num_episodes"])
-
-    # R_max = 0
-    # convergence_results_met = []
-    # convergence_results_first_epi = []
-    # # Whites Convergence
-    # for agent_num in range(0,setup_num):
-    #     visual_save_dir = agent_save_dir+'/'+str(self.ExperimentConfig['name']+'/Setup_'+str(agent_num+1))
-    #     # Whites Convergence
-    #     value_list_w = training_results_full[training_results_full['Setup']==(agent_num+1)]['Whites_total_reward'].values
-    #     convergence_met_w = conv_measure.convergence_check(value_list_w, 'Whites', visual_save_dir)
-    #     # Blacks Convergence
-    #     value_list_b = training_results_full[training_results_full['Setup']==(agent_num+1)]['Blacks_total_reward'].values
-    #     convergence_met_b = conv_measure.convergence_check(value_list_b, 'Blacks', visual_save_dir)
-    #     # Log for output file
-    #     convergence_results_met.append([convergence_met_w[0],convergence_met_b[0]])
-    #     convergence_results_first_epi.append([convergence_met_w[1],convergence_met_b[1]])
-    #     if convergence_met_w[0]==True:
-    #         Final_R_w = training_results_full[training_results_full['Setup']==(agent_num+1)]['Whites_total_reward'].iloc[-1]
-    #         if Final_R_w >= R_max:
-    #             best_agent = agents_temp[agent_num]
-    #             R_max = Final_R_w
-    #         else:
-    #             continue
-    #     else:
-    #         continue
-    #     if convergence_met_b[0]==True:
-    #         Final_R_w = training_results_full[training_results_full['Setup']==(agent_num+1)]['Blacks_total_reward'].iloc[-1]
-    #         if Final_R_w >= R_max:
-    #             best_agent = agents_temp[agent_num]
-    #             R_max = Final_R_w
-    #         else:
-    #             continue
-    #     else:
-    #         continue
-
-    # with open(self.save_dir+'/'+str(self.ExperimentConfig['name'])+'_convergence_results.txt', 'w') as f:
-    #     f.write('Agent list: ' + str(list(agents_summary_info.keys()))+'\n'+ 
-    #             '--- \n' +
-    #             'Converegence Met: ' + str(convergence_results_met)+'\n'+
-    #             'Converegence First Episode: ' + str(convergence_results_first_epi)+'\n')            
-
-    # if R_max == 0:
-    #     print("No agents convereged...Selecting first agent for testing...")
-    #     agents.append(agents_temp[0])
-    # else:
-    #     agents.append(best_agent)
-
-
     def convergence_check(self, value_list: List[float], player_side: str, visual_save_dir: str):
         """ CONVERGENCE CHECK METHODOLOGY
         - Goes through each Q value by episode and calculates the percentage change from the previous result

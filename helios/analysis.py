@@ -23,15 +23,6 @@ class Analysis:
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
         
-        # Training Results
-        # 'agent': self.agent_name,
-        # 'opponent: black_agent,
-        # 'episode': episode, 
-        # 'num_actions': action_num, 
-        # 'results': self.board.result(),
-        # "total_reward": reward_tracker,
-        # "time_per_episode":(end_time - start_time),
-        # "time_per_action":(end_time - start_time)/action_num},index=[episode]
         VisualAnalysis = VisualOutput(training_results, save_dir, show_figures, self.window_size)
         VisualAnalysis.episode_reward_graph()
         VisualAnalysis.cumulative_reward_graph()

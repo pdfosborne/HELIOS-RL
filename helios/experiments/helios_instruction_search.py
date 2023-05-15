@@ -25,6 +25,7 @@ from helios.agents.agent_abstract import Agent, QLearningAgent
 from helios.agents.table_q_agent import TableQLearningAgent
 from helios.agents.neural_q_agent import NeuralQLearningAgent
 
+# TODO: Enable any number of the same agent types with varying parameters
 AGENT_TYPES = {
     "Qlearntab": TableQLearningAgent,
     "Neural_Q": NeuralQLearningAgent,
@@ -39,6 +40,7 @@ PLAYER_PARAMS = {
     "Neural_Q_language": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"]
 }
 
+# TODO use encoder defined by config not manual import
 from helios.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
 
 # This is the main run functions for HELIOS to be imported
@@ -348,8 +350,7 @@ class HELIOS_SEARCH:
         # --------------------------------------------------------------------------------
         # Quick Visual Analysis of Feedback results
         goal = str(sample_env.start_obs).split(".")[0] + '_GOAL'
-        
-        
+         
         plan_numbers = []
         feedback_required = []
         for plan_num in self.feedback_results[agent_type+'_'+adapter]:

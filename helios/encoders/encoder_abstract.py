@@ -24,6 +24,6 @@ class StateEncoder(Encoder):
         return StateEncoder.tensor_cache[offset + index]
 
         
-    def encode(self, state:list = None, legal_actions:list = None, prior_action:str = None) -> Tensor:
+    def encode(self, state:list = None, legal_actions:list = None, episode_action_history:str = None) -> Tensor:
         pass
     
