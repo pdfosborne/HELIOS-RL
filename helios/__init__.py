@@ -1,4 +1,4 @@
-from .experiments.standard import EXPERIMENT
-from .experiments.supervised_instruction_following import SUPERVISED_EXPERIMENT
-from .experiments.unsupervised_instruction_following import UNSUPERVISED_SEARCH
+from .experiments.standard import Experiment
+from .experiments.supervised_instruction_following import SupervisedExperiment
+from .experiments.unsupervised_instruction_following import UnsupervisedSearch
 from .experiments.helios import HELIOS

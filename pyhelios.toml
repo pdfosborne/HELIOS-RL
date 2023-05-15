@@ -1,0 +1,18 @@
+[project]
+name = "HELIOS-RL"
+version = "0.0.1"
+authors = [
+  { name="Philip Osborne", email="pdfosborne@gmail.com" },
+]
+description = "Applying the HELIOS architecture to Reinforcement Learning problems."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Public License v3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/pdfosborne/HELIOS-RL"
+"Bug Tracker" = "https://github.com/pdfosborne/HELIOS-RL/issues"
