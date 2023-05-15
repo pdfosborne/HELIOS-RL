@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='HELIOS-RL-TEST',
-    version='0.3',
+    version='0.3.3',
     packages=['heliosRL'],
     url='https://github.com/pdfosborne/HELIOS-RL',
     license='GNU Public License v3',
