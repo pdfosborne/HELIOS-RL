@@ -2,9 +2,9 @@ import torch
 
 # ------ Agent Imports -----------------------------------------
 # Universal Agents
-from heliosRL.agents.agent_abstract import Agent, QLearningAgent
-from heliosRL.agents.table_q_agent import TableQLearningAgent
-from heliosRL.agents.neural_q_agent import NeuralQLearningAgent
+from helios_rl.agents.agent_abstract import Agent, QLearningAgent
+from helios_rl.agents.table_q_agent import TableQLearningAgent
+from helios_rl.agents.neural_q_agent import NeuralQLearningAgent
 
 AGENT_TYPES = {
     "Qlearntab": TableQLearningAgent,
@@ -20,7 +20,7 @@ PLAYER_PARAMS = {
     "Neural_Q_language": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"]
 }
 
-from heliosRL.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
+from helios_rl.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
 
 # This is the main run functions for HELIOS to be imported
 # Defines the train/test operators and imports all the required agents and experiment functions ready to be used

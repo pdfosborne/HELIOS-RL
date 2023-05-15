@@ -1,5 +1,5 @@
 import random
-from heliosRL.agents.agent_abstract import Agent
+from helios_rl.agents.agent_abstract import Agent
 import torch
 from torch import Tensor
 

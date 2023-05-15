@@ -2,7 +2,7 @@ import torch
 from typing import List, Any
 from torch import Tensor
 
-from heliosRL.encoders.encoder_abstract import StateEncoder
+from helios_rl.encoders.encoder_abstract import StateEncoder
 
 class StateEncoder():
     def __init__(self, possible_states):

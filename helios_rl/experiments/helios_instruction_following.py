@@ -3,12 +3,12 @@ import pandas as pd
 import json
 
 # ------ Experiment Import --------------------------------------
-from heliosRL.analysis import Analysis
+from helios_rl.analysis import Analysis
 # ------ Agent Imports -----------------------------------------
 # Universal Agents
-from heliosRL.agents.agent_abstract import Agent, QLearningAgent
-from heliosRL.agents.table_q_agent import TableQLearningAgent
-from heliosRL.agents.neural_q_agent import NeuralQLearningAgent
+from helios_rl.agents.agent_abstract import Agent, QLearningAgent
+from helios_rl.agents.table_q_agent import TableQLearningAgent
+from helios_rl.agents.neural_q_agent import NeuralQLearningAgent
 
 # TODO: Enable any number of the same agent types with varying parameters
 AGENT_TYPES = {
@@ -34,7 +34,7 @@ PLAYER_PARAMS = {
 # -> instruction following approach then becomes alternative form of this file to be called instead
 # -> This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalise naming for this
 
-class HELIOS_OPTIMIZE:
+class HeliosOptimize:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, 
                  save_dir:str, show_figures:str, window_size:float,
                  instruction_path: dict, predicted_path: dict=None):

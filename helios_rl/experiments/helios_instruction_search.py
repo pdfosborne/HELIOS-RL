@@ -6,16 +6,16 @@ import torch
 import matplotlib.pyplot as plt
 
 # ------ Experiment Import --------------------------------------
-from heliosRL.analysis import Analysis
+from helios_rl.analysis import Analysis
 # ------ Evaluation Metrics -----------------------------------------
-from heliosRL.evaluation.convergence_measure import Convergence_Measure
+from helios_rl.evaluation.convergence_measure import Convergence_Measure
 # ------ Instruction Inputs -----------------------------------------
-from heliosRL.experiments.helios_instr_input import HeliosInput
+from helios_rl.experiments.helios_instr_input import HeliosInput
 # ------ Agent Imports -----------------------------------------
 # Universal Agents
-from heliosRL.agents.agent_abstract import Agent, QLearningAgent
-from heliosRL.agents.table_q_agent import TableQLearningAgent
-from heliosRL.agents.neural_q_agent import NeuralQLearningAgent
+from helios_rl.agents.agent_abstract import Agent, QLearningAgent
+from helios_rl.agents.table_q_agent import TableQLearningAgent
+from helios_rl.agents.neural_q_agent import NeuralQLearningAgent
 
 # TODO: Enable any number of the same agent types with varying parameters
 AGENT_TYPES = {
@@ -33,7 +33,7 @@ PLAYER_PARAMS = {
 }
 
 # TODO use encoder defined by config not manual import
-from heliosRL.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
+from helios_rl.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
 
 # This is the main run functions for HELIOS to be imported
 # Defines the train/test operators and imports all the required agents and experiment functions ready to be used
@@ -43,7 +43,7 @@ from heliosRL.encoders.sentence_transformer_MiniLM_L6v2 import LanguageEncoder
 # -> results then passed down to experiment to produce visual reporting (staticmethod)
 # -> instruction following approach then becomes alternative form of this file to be called instead
 
-class HELIOS_SEARCH:
+class HeliosSearch:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, 
                  save_dir:str, 
                  num_plans:int=1, number_exploration_episodes:int = 100, sim_threshold:float = 0.9,

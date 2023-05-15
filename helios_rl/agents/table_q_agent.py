@@ -8,7 +8,7 @@ from typing import List, Tuple, Dict
 import torch
 from torch import Tensor
 
-from heliosRL.agents.agent_abstract import QLearningAgent
+from helios_rl.agents.agent_abstract import QLearningAgent
 
 
 logger = logging.getLogger()

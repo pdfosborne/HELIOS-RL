@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from typing import List, Dict, Iterable
 from abc import ABC, abstractmethod
-from heliosRL.adapters import StateAdapter
+from helios_rl.adapters import StateAdapter
 from torch import Tensor
 
 

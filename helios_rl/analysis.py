@@ -8,8 +8,8 @@ import os
 import warnings
 warnings.filterwarnings("ignore")
 
-from heliosRL.evaluation.visual_output import VisualOutput
-from heliosRL.evaluation.tabular_output import TabularOutput
+from helios_rl.evaluation.visual_output import VisualOutput
+from helios_rl.evaluation.tabular_output import TabularOutput
 class Analysis:
     """Calls the Local Environment function and produces analysis reports & figures."""
     def __init__(self, window_size) -> None:

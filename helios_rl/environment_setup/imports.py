@@ -1,5 +1,5 @@
 from typing import List
-from heliosRL.agents.agent_abstract import Agent, QLearningAgent
+from helios_rl.agents.agent_abstract import Agent, QLearningAgent
 
 
 class ImportHelper:

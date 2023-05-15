@@ -12,7 +12,7 @@ from torch import Tensor
 from torch.autograd import Variable
 from sentence_transformers import SentenceTransformer
 
-from heliosRL.agents.agent_abstract import QLearningAgent
+from helios_rl.agents.agent_abstract import QLearningAgent
 
 # Hyper Parameters
 TARGET_REPLACE_ITER = 100   # target update frequency

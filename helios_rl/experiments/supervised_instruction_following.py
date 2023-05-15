@@ -2,13 +2,13 @@ import os
 import json
 
 # ------ Experiment Import --------------------------------------
-from heliosRL.analysis import Analysis
+from helios_rl.analysis import Analysis
 
 # ------ Agent Imports -----------------------------------------
 # Universal Agents
-from heliosRL.agents.agent_abstract import Agent, QLearningAgent
-from heliosRL.agents.table_q_agent import TableQLearningAgent
-from heliosRL.agents.neural_q_agent import NeuralQLearningAgent
+from helios_rl.agents.agent_abstract import Agent, QLearningAgent
+from helios_rl.agents.table_q_agent import TableQLearningAgent
+from helios_rl.agents.neural_q_agent import NeuralQLearningAgent
 
 AGENT_TYPES = {
     "Qlearntab": TableQLearningAgent,

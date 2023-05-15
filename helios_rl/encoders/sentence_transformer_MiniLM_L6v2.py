@@ -6,7 +6,7 @@ from collections import Counter
 
 
 from torch import Tensor
-from heliosRL.encoders.encoder_abstract import StateEncoder
+from helios_rl.encoders.encoder_abstract import StateEncoder
 
 # Language Encoder
 from sentence_transformers import SentenceTransformer
