@@ -42,7 +42,7 @@ PLAYER_PARAMS = {
 # -> instruction following approach then becomes alternative form of this file to be called instead
 # -> DONE: This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalize naming for this
 
-class EXPERIMENT:
+class Experiment:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, save_dir:str, show_figures:str, window_size:float):
         self.ExperimentConfig = Config
         self.LocalConfig = LocalConfig

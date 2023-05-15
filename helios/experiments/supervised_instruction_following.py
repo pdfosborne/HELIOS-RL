@@ -42,7 +42,7 @@ PLAYER_PARAMS = {
 # -> instruction following approach then becomes alternative form of this file to be called instead
 # -> TODO: This means we have multiple main.py types (e.g. with/without convergence measure) so should create a directory and finalise naming for this
 
-class SUPERVISED_EXPERIMENT:
+class SupervisedExperiment:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, 
                  save_dir:str, show_figures:str, window_size:float, 
                  instruction_path: dict, predicted_path: dict=None):
