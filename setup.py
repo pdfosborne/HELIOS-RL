@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='HELIOS-RL-Test',
-    version='0.3.4',
+    version='0.3.6',
     packages=[
         'helios_rl', 
         'helios_rl.adapters', 

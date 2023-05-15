@@ -25,7 +25,8 @@ class LanguageEncoder(StateEncoder):
                indexed: bool = False) -> Tensor:
         if (len(state) == 0):
             state = [""]
-        if type(state) != type(list(str)):
+            
+        if type(state) != type(list('')):
             state = list(state)
             
         to_encode = [sent for sent in state if sent not in LanguageEncoder._cached_enc]
