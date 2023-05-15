@@ -19,3 +19,4 @@ from helios.agents.agent_abstract import Agent, QLearningAgent
 from helios.agents.table_q_agent import TableQLearningAgent
 from helios.agents.neural_q_agent import NeuralQLearningAgent
 
+print("TEST")
