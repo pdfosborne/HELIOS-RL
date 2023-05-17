@@ -91,6 +91,7 @@ class HeliosSearch:
 
 
     def search(self, action_cap:int=5, re_search_override:bool=False, simulated_instr_goal:any=None):
+        device = "cuda" if torch.cuda.is_available() else "cpu" 
         # Trigger re-search
         if re_search_override:
             self.observed_states:dict = {}
@@ -172,14 +173,14 @@ class HeliosSearch:
                                     sim = self.instruction_results[instruction][agent_type+'_'+adapter]['sim_score']
                             else:
                                 self.instruction_results[instruction][agent_type+'_'+adapter] = {}
-                                feedback_layer = torch.zeros(instruction_vector.size())
+                                feedback_layer = torch.zeros(instruction_vector.size()).to(device)
                             self.instruction_results[instruction][agent_type+'_'+adapter]['count'] = self.instruction_results[instruction][agent_type+'_'+adapter]['count']+1
                         else:
                             self.instruction_results[instruction] = {}    
                             self.instruction_results[instruction][agent_type+'_'+adapter] = {} 
                             self.instruction_results[instruction][agent_type+'_'+adapter]['count'] = 1
                             self.instruction_results[instruction][agent_type+'_'+adapter]['action_cap'] = action_cap
-                            feedback_layer = torch.zeros(instruction_vector.size())
+                            feedback_layer = torch.zeros(instruction_vector.size()).to(device)
                             self.instruction_results[instruction][agent_type+'_'+adapter]['feedback_layer'] = feedback_layer
                         # ---------------------------
                         search_count=0
