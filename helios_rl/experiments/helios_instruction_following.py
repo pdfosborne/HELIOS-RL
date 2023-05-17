@@ -176,6 +176,9 @@ class HeliosOptimize:
                         setup_num = seed_recall[goal]
                     else:
                         seed_recall[goal] = 1
+                    # Load results table from previous seeds to continue output graphs
+                    if goal in seed_results_connection:
+                        live_env.results.load(seed_results_connection[goal])
                 
                     # - Results save dir -> will override for same goal if seen in later seed
                     if self.num_training_seeds > 1:
@@ -325,7 +328,6 @@ class HeliosOptimize:
                                 # TODO: ADOPT AGENT OF MOST SIMILAR POLICY
                                 # ---
                                 sub_goal = self.instruction_path[instr][agent_type+'_'+adapter]['sub_goal']
-                                
                                 live_env.sub_goal = sub_goal
                                 live_env.agent.exploration_parameter_reset()
                                 if type(instr_results)==type(pd.DataFrame()):
@@ -370,9 +372,8 @@ class HeliosOptimize:
                         # Remove sub-goal
                         live_env.sub_goal = None
                         print("Goal: ", goal)
-                        if goal in seed_results_connection:
-                            live_env.results.load(seed_results_connection[goal])
-                        elif type(instr_results)==type(pd.DataFrame()):
+                        # Add instruction training to output chart
+                        if type(instr_results)==type(pd.DataFrame()):
                             live_env.results.load(instr_results)
                         
                         training_results = live_env.episode_loop()
