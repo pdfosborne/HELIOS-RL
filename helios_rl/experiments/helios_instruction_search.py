@@ -167,7 +167,9 @@ class HeliosSearch:
                                 # We use feedback layer even if sub_goal not a good match
                                 feedback_layer = self.instruction_results[instruction][agent_type+'_'+adapter]['feedback_layer']
                                 if (self.instruction_results[instruction][agent_type+'_'+adapter]['sim_score']>=self.sim_threshold):
-                                    sub_goal = self.instruction_results[instruction][agent_type+'_'+adapter]['sub_goal']
+                                    sub_goal = self.instruction_results[instruction][agent_type+'_'+adapter]['sub_goal'][0]
+                                    sub_goal_list = self.instruction_results[instruction][agent_type+'_'+adapter]['sub_goal']
+                                    sim = self.instruction_results[instruction][agent_type+'_'+adapter]['sim_score']
                             else:
                                 self.instruction_results[instruction][agent_type+'_'+adapter] = {}
                                 feedback_layer = torch.zeros(instruction_vector.size())
@@ -236,6 +238,7 @@ class HeliosSearch:
                                 if max_sim < self.sim_threshold:
                                     sub_goal = sub_goal_max
                                     sub_goal_list.append(sub_goal)
+                                    sub_goal_t = sub_goal_max_t
                                     # for obs_state in self.observed_states:
                                     #     str_state = self.observed_states[obs_state]
                                     #     #str_state_stacked = ' '.join(str_state)
@@ -297,13 +300,13 @@ class HeliosSearch:
                                 if (feedback.lower() == 'y')|(feedback.lower() == 'yes'):
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
-                                        for sentence in sub_goal_max_t:
+                                        for sentence in sub_goal_t:
                                             feedback_layer[idx] = torch.add(feedback_layer_sent, self.feedback_increment*(torch.sub(instr_sentence, sentence))) 
                                     total_sim = 0
                                     # Average sim across each sentence in instruction vs state
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
-                                        for state_sentence in sub_goal_max_t:
+                                        for state_sentence in sub_goal_t:
                                             total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence)
                                     sim = total_sim.item()/(len(instruction_vector)*len(t_state))
                                     sim_delta = sim-max_sim
@@ -312,13 +315,13 @@ class HeliosSearch:
                                 else:
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
-                                        for sentence in sub_goal_max_t:
+                                        for sentence in sub_goal_t:
                                             feedback_layer[idx] = torch.sub(feedback_layer_sent, self.feedback_increment*(torch.sub(instr_sentence, sentence)))
                                     total_sim = 0
                                     # Average sim across each sentence in instruction vs state
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
-                                        for state_sentence in sub_goal_max_t:
+                                        for state_sentence in sub_goal_t:
                                             total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence)
                                     sim = total_sim.item()/(len(instruction_vector)*len(t_state))
                                     sim_delta = sim-max_sim
@@ -327,7 +330,7 @@ class HeliosSearch:
                         if (agent_type+'_'+adapter) not in self.instruction_results[instruction]:
                             self.instruction_results[instruction][agent_type+'_'+adapter] = {}   
                         self.instruction_results[instruction][agent_type+'_'+adapter]['sub_goal'] = sub_goal_list
-                        self.instruction_results[instruction][agent_type+'_'+adapter]['sim_score'] = max_sim
+                        self.instruction_results[instruction][agent_type+'_'+adapter]['sim_score'] = sim
                         self.instruction_results[instruction][agent_type+'_'+adapter]['feedback_layer'] = feedback_layer
                 # log results of feedback loop
                 if (agent_type+'_'+adapter) not in self.feedback_results:
@@ -382,6 +385,7 @@ class HeliosSearch:
         with open(self.save_dir+'/instruction_predictions.json', 'w') as f:
             json.dump(instruction_predictions, f)
         
-
+        print("-- Complete Instruction Results --")
+        print(self.instruction_results)
 
         return self.observed_states, self.instruction_results
