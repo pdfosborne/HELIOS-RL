@@ -72,6 +72,10 @@ class EXPERIMENT:
         for n, agent_type in enumerate(self.setup_info['agent_select']):
             # We are adding then overriding some inputs from general configs for experimental setups
             train_setup_info = self.setup_info.copy()
+            # TODO: fix experience sampling
+            if train_setup_info['experience_sample_batch_ratio']>0:
+                print("NOTE - Experience Sampling feature not currently implemented and will not be used")
+                train_setup_info['experience_sample_batch_ratio'] = 0
             # ----- State Adapter Choice
             adapter = train_setup_info["adapter_select"][n]
             # ----- Agent parameters

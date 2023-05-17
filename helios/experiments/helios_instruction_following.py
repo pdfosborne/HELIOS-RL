@@ -45,7 +45,7 @@ PLAYER_PARAMS = {
 class HELIOS_OPTIMIZE:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, 
                  save_dir:str, show_figures:str, window_size:float,
-                 instruction_path: dict, predicted_path: dict=None):
+                 instruction_path: dict, predicted_path: dict=None, instruction_episode_ratio:float=0.1):
         self.ExperimentConfig = Config
         self.LocalConfig = LocalConfig
         
@@ -104,6 +104,8 @@ class HELIOS_OPTIMIZE:
         self.trained_agents: dict = {}
         self.num_training_seeds = self.setup_info['number_training_seeds']
         self.analysis = Analysis(window_size=window_size)
+        # Defines the number of episodes used for sub-instructions
+        self.instruction_episode_ratio = instruction_episode_ratio
         
     def train(self):
         if not os.path.exists(self.save_dir):
@@ -112,6 +114,10 @@ class HELIOS_OPTIMIZE:
         for n, agent_type in enumerate(self.setup_info['agent_select']):
             # We are adding then overriding some inputs from general configs for experimental setups
             train_setup_info = self.setup_info.copy()
+            # TODO: fix experience sampling
+            if train_setup_info['experience_sample_batch_ratio']>0:
+                print("NOTE - Experience Sampling feature not currently implemented and will not be used")
+                train_setup_info['experience_sample_batch_ratio'] = 0
             # ----- State Adapter Choice
             adapter = train_setup_info["adapter_select"][n]
             # ----- Agent parameters
@@ -302,6 +308,7 @@ class HELIOS_OPTIMIZE:
                         # Set start position of env for next -> pick first sub-goal env label
                         start = str(env_start).split(".")[0]
                         i=0
+                        total_instr_episodes = 0
                         instr_results = None
                         while True:
                             i+=1
@@ -312,6 +319,13 @@ class HELIOS_OPTIMIZE:
                                         max_count = self.known_instructions_dict[(agent_type+'_'+adapter)][start][end]
                                         instr = start + "-" + end
                                         print("Sub-instr: ", instr)
+                                        
+                                # Instructions use fewer epispdes, lower bound to 50
+                                number_instr_episodes = int(number_training_episodes*self.instruction_episode_ratio)
+                                if number_instr_episodes<50:
+                                    number_instr_episodes=50
+                                total_instr_episodes+=number_instr_episodes
+                                live_env.num_train_episodes = number_instr_episodes
                                 # ---
                                 # Override trained agent with known instruction agent
                                 if instr in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
@@ -319,6 +333,7 @@ class HELIOS_OPTIMIZE:
                                 # TODO: ADOPT AGENT OF MOST SIMILAR POLICY
                                 # ---
                                 sub_goal = self.instruction_path[instr][agent_type+'_'+adapter]['sub_goal']
+                                
                                 live_env.sub_goal = sub_goal
                                 live_env.agent.exploration_parameter_reset()
                                 if type(instr_results)==type(pd.DataFrame()):
@@ -352,6 +367,15 @@ class HELIOS_OPTIMIZE:
                                 break
                         # train for entire path 
                         #live_env.start_obs = env_start
+                        # Number of episodes used reduced by those used for instructions (lower bounded)
+                        if (number_training_episodes-total_instr_episodes)<int(number_training_episodes*self.instruction_episode_ratio):
+                            if int(number_training_episodes*self.instruction_episode_ratio) < 50:
+                                live_env.num_train_epispdes = 50
+                            else:
+                                live_env.num_train_epispdes = int(number_training_episodes*self.instruction_episode_ratio)
+                        else:
+                            live_env.num_train_episodes = number_training_episodes - total_instr_episodes
+                        # Remove sub-goal
                         live_env.sub_goal = None
                         print("Goal: ", goal)
                         if goal in seed_results_connection:
@@ -362,7 +386,6 @@ class HELIOS_OPTIMIZE:
                         training_results = live_env.episode_loop()
                         training_results['episode'] = training_results.index
                         
-
                     # Opponent now defined in local setup.py
                     # ----- Log training setup      
                     training_results.insert(loc=0, column='Repeat', value=setup_num)                    
