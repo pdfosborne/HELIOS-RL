@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='HELIOS-RL-Test',
-    version='0.4.0',
+    version='0.3.6',
     packages=[
         'helios_rl', 
         'helios_rl.adapters', 
@@ -14,10 +14,15 @@ setup(
     url='https://github.com/pdfosborne/HELIOS-RL',
     license='GNU Public License v3',
     author='Philip Osborne',
-    author_email='XXX',
-    description='XXX',
+    author_email='pdfosborne@gmail.com',
+    description='Applying the HELIOS architecture to Reinforcement Learning problems.',
     install_requires=[
         'numpy',
-        'pandas'
+        'pandas',
+        'matplotlib',
+        'seaborn',
+        'scipy',
+        'torch',
+        'sentence-transformers'
     ]
 )
