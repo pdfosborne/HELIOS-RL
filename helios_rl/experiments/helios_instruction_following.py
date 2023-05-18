@@ -315,10 +315,10 @@ class HeliosOptimize:
                                         instr = start + "-" + end
                                         print("Sub-instr: ", instr)
                                         
-                                # Instructions use fewer epispdes, lower bound to 50
+                                # Instructions use fewer epispdes, lower bound to 10
                                 number_instr_episodes = int(number_training_episodes*self.instruction_episode_ratio)
-                                if number_instr_episodes<50:
-                                    number_instr_episodes=50
+                                if number_instr_episodes<10:
+                                    number_instr_episodes=10
                                 total_instr_episodes+=number_instr_episodes
                                 live_env.num_train_episodes = number_instr_episodes
                                 # ---
@@ -363,8 +363,8 @@ class HeliosOptimize:
                         #live_env.start_obs = env_start
                         # Number of episodes used reduced by those used for instructions (lower bounded)
                         if (number_training_episodes-total_instr_episodes)<int(number_training_episodes*self.instruction_episode_ratio):
-                            if int(number_training_episodes*self.instruction_episode_ratio) < 50:
-                                live_env.num_train_epispdes = 50
+                            if int(number_training_episodes*self.instruction_episode_ratio) < 10:
+                                live_env.num_train_epispdes = 10
                             else:
                                 live_env.num_train_epispdes = int(number_training_episodes*self.instruction_episode_ratio)
                         else:
