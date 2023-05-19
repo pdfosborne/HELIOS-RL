@@ -147,9 +147,9 @@ class HeliosSearch:
                     for i,instr in enumerate(instructions):
                         
                         if i == 0:
-                            instruction = str(sample_env.start_obs).split(".")[0] + "-" + instr
+                            instruction = str(sample_env.start_obs).split(".")[0] + "---" + instr
                         else:
-                            instruction = instructions[i-1] + "-" + instr
+                            instruction = instructions[i-1] + "---" + instr
                         
                         instr_description = instr_descriptions[i]
                         

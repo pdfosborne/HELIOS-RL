@@ -170,7 +170,7 @@ class HeliosOptimize:
                         live_env.start_obs = env_start
 
                     env_start = live_env.start_obs
-                    goal = str(env_start).split(".")[0] + "-" + "GOAL"
+                    goal = str(env_start).split(".")[0] + "---" + "GOAL"
                     print("Long-term Goal: ", goal)
                     if goal in seed_recall:
                         setup_num = seed_recall[goal]
@@ -214,7 +214,7 @@ class HeliosOptimize:
                                     for end in self.known_instructions_dict[(agent_type+'_'+adapter)][start]:
                                         if self.known_instructions_dict[(agent_type+'_'+adapter)][start][end] > max_count:
                                             max_count = self.known_instructions_dict[(agent_type+'_'+adapter)][start][end]
-                                            instr = start + "-" + end
+                                            instr = start + "---" + end
                                             print("Sub-instr: ", instr)
                                     # ---
                                     # Override trained agent with known instruction agent 
@@ -312,7 +312,7 @@ class HeliosOptimize:
                                 for end in self.known_instructions_dict[(agent_type+'_'+adapter)][start]:
                                     if self.known_instructions_dict[(agent_type+'_'+adapter)][start][end] > max_count:
                                         max_count = self.known_instructions_dict[(agent_type+'_'+adapter)][start][end]
-                                        instr = start + "-" + end
+                                        instr = start + "---" + end
                                         print("Sub-instr: ", instr)
                                         
                                 # Instructions use fewer epispdes, lower bound to 10
@@ -448,7 +448,7 @@ class HeliosOptimize:
                 env = self.env(test_setup_info)
                 # ---
                 start_obs = env.start_obs
-                goal = str(start_obs).split(".")[0] + "-" + "GOAL"
+                goal = str(start_obs).split(".")[0] + "---" + "GOAL"
                 print("Flat agent Goal: ", goal)
                 # Override with trained agent if goal seen previously
                 if goal in self.trained_agents[test_setup_info['agent_type']+ '_' +test_setup_info['adapter_select']]:
