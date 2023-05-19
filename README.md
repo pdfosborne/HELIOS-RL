@@ -15,3 +15,11 @@ Second, instead of simplying importing pre-built agents into a custom system we 
 Lastly, analysis formatting and structure is generated such that the individual user only needs to interpret them to adjust parameters accordingly.
 
 Provided a user can setup their problem using the template structure provided they can then leverage the most advanced Reinforcement Learning approaches with a simple parameter input. This also ensures the system is future-proof as new agents or encoders will be added as modules in later updates. 
+
+A template for applying to any Reinforcement Learning problem can be found at the following link: https://github.com/pdfosborne/HELIOS-RL-TEMPLATE
+
+Currently setup problems include:
+- Classroom: A simple GridWorld educational problem https://github.com/pdfosborne/HELIOS-RL-Classroom 
+- Chess: Play using the Python Chess engine re-defined as a Text Game https://github.com/pdfosborne/HELIOS-RL-Chess 
+- ScienceWorld: Solve school level science problems in an interactive Text Game environment https://github.com/pdfosborne/HELIOS-RL-ScienceWorld
+- TextWorldExpress: A collection of Text Games optimized to run fast! Includes CookingWorld, TextWorld Commonsense and Coin Collector https://github.com/pdfosborne/HELIOS-RL-TextWorldExpress
