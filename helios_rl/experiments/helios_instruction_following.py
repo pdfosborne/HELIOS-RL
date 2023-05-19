@@ -448,7 +448,7 @@ class HeliosOptimize:
                 env = self.env(test_setup_info)
                 # ---
                 start_obs = env.start_obs
-                goal = str(start_obs.split("/")[0]).split(".")[0] + "-" + "GOAL"
+                goal = str(start_obs).split(".")[0] + "-" + "GOAL"
                 print("Flat agent Goal: ", goal)
                 # Override with trained agent if goal seen previously
                 if goal in self.trained_agents[test_setup_info['agent_type']+ '_' +test_setup_info['adapter_select']]:
@@ -460,7 +460,7 @@ class HeliosOptimize:
                 # ---
                 # Testing generally is the agents replaying on the testing ENV
                 testing_results = env.episode_loop() 
-                test_save_dir = (self.save_dir+'/'+agent_adapter+'__testing_results_'+str(goal)+"_"+str(testing_repeat) )
+                test_save_dir = (self.save_dir+'/'+agent_adapter+'__testing_results_'+str(goal).split("/")[0]+"_"+str(testing_repeat) )
                 if not os.path.exists(test_save_dir):
                     os.mkdir(test_save_dir)
                 # Produce training report with Analysis.py
