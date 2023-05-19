@@ -73,8 +73,8 @@ class HeliosOptimize:
         self.known_instructions = list(self.instruction_path.keys())
         self.known_instructions_dict = {}
         for instr in self.known_instructions:
-            start = instr.split("-")[0]
-            end = instr.split("-")[1]
+            start = instr.split("---")[0]
+            end = instr.split("---")[1]
 
             for n, agent_type in enumerate(self.setup_info['agent_select']):
                 adapter = self.setup_info["adapter_select"][n]
