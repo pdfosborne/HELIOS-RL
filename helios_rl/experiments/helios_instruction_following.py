@@ -239,7 +239,7 @@ class HeliosOptimize:
                                     sample_batch_results_store[instr] = live_env.results.copy()
                                     # ---
                                     # Store instruction results
-                                    instr_save_dir = agent_save_dir+'/'+str(i)+"-"+instr.replace(" ","")
+                                    instr_save_dir = agent_save_dir+'/'+str(i)+"-"+instr.replace(" ","").replace("/","_")
                                     if not os.path.exists(instr_save_dir):
                                         os.mkdir(instr_save_dir)
 
@@ -336,7 +336,7 @@ class HeliosOptimize:
                                 training_results['episode'] = training_results.index
                                 # ---
                                 # Store instruction results
-                                instr_save_dir = agent_save_dir+'/'+str(i)+"-"+instr.replace(" ","")
+                                instr_save_dir = agent_save_dir+'/'+str(i)+"-"+instr.replace(" ","").replace("/","_")
                                 if not os.path.exists(instr_save_dir):
                                     os.mkdir(instr_save_dir)
 
