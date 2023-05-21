@@ -235,26 +235,25 @@ class HeliosSearch:
                                         sub_goal = obs_state # Sub-Goal code
                                         sub_goal_list.append(sub_goal)
                 
-                                # TODO: OR if none above threshold within (1-threshold%) of max sim
+                                # OR if none above threshold matching max sim
                                 if max_sim < self.sim_threshold:
                                     sub_goal = sub_goal_max
-                                    sub_goal_list.append(sub_goal)
-                                    sub_goal_t = sub_goal_max_t
-                                    # for obs_state in self.observed_states:
-                                    #     str_state = self.observed_states[obs_state]
-                                    #     #str_state_stacked = ' '.join(str_state)
-                                    #     t_state = self.enc.encode(str_state)
-                                    #     # ---
-                                    #     total_sim = 0
-                                    #     # Average sim across each sentence in instruction vs state
-                                    #     for i,instr_sentence in enumerate(instruction_vector):
-                                    #         feedback_layer_sent = feedback_layer[i]
-                                    #         for state_sentence in t_state:
-                                    #             total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence) 
-                                    #     sim = total_sim.item()/(len(instruction_vector)*len(t_state))
-                                    #     if sim >= max_sim*(self.sim_threshold):
-                                    #         sub_goal = obs_state # Temp Sub-Goal as most known similar
-                                    #         sub_goal_list.append(sub_goal)
+                                    sub_goal_t = sub_goal_max_t                                    
+                                    # Find all states that have same sim as max
+                                    for obs_state in self.observed_states:
+                                        str_state = self.observed_states[obs_state]
+                                        #str_state_stacked = ' '.join(str_state)
+                                        t_state = self.enc.encode(str_state)
+                                        # ---
+                                        total_sim = 0
+                                        # Average sim across each sentence in instruction vs state
+                                        for i,instr_sentence in enumerate(instruction_vector):
+                                            feedback_layer_sent = feedback_layer[i]
+                                            for state_sentence in t_state:
+                                                total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence) 
+                                        sim = total_sim.item()/(len(instruction_vector)*len(t_state))
+                                        if sim >= (max_sim):
+                                            sub_goal_list.append(obs_state)
 
                                 if max_sim < self.sim_threshold:
                                     print("Minimum sim for observed states to match instruction not found, using best match instead. Best match sim value = ", max_sim )
@@ -271,6 +270,7 @@ class HeliosSearch:
                                 print("-- Best match: ", sub_goal_max)
                                 sub_goal = None
                                 self.observed_states = {}
+                                search_count = 0
                             else:
                                 if not simulated_instr_goal:
                                     print(" ")
@@ -278,6 +278,9 @@ class HeliosSearch:
                                     print("Instruction: ", instr)
                                     print(sub_goal)
                                     print("Best match state for instruction \n ______ \n Adapted form: \n\t - ", self.observed_states[sub_goal], " \n Engine observation: \n\t - " , sub_goal)
+                                    print("Full list of matching states...",)
+                                    for s_g in sub_goal_list:
+                                        print(self.observed_states[s_g], ": ", s_g)
                                     feedback = input("-- Does this match the expectation instruction outcome? (Y/N)")
                                     feedback_count+=1 
                                 else:

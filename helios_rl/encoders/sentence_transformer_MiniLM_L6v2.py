@@ -25,9 +25,12 @@ class LanguageEncoder(StateEncoder):
                indexed: bool = False) -> Tensor:
         if (len(state) == 0):
             state = [""]
-            
-        if type(state) != type(list('')):
-            state = list(state)
+        
+        # I think typing is overriding the input type anyway -> need to ensure sentences are split up
+        # if type(state) != type(list('')):
+        #     state = state.split('.')
+        if len( state[0].split('.') ) > len([state[0]]):
+            state = state.split(".")
             
         to_encode = [sent for sent in state if sent not in LanguageEncoder._cached_enc]
         if (to_encode):
