@@ -153,11 +153,13 @@ class HeliosSearch:
                         
                         instr_description = instr_descriptions[i]
                         
-                        if type(instr_description) != type(List[str]):
+                        if type(instr_description) == type(''):
                             instr_description = instr_description.split('.')
                             instr_description = list(filter(None, instr_description))
                         # Create tensor vector of description
                         instruction_vector = self.enc.encode(instr_description)
+                        print("Size of Encoded Instruction Tensor")
+                        print(instruction_vector.size())
                         # EXPLORE TO FIND LOCATION OF SUB-GOAL
                         sub_goal = None
                         # ---------------------------
@@ -222,17 +224,24 @@ class HeliosSearch:
                                     t_state = self.enc.encode(str_state)
                                     # ---
                                     total_sim = 0
+                                    dim_count = 0 # For some reason encoder here is adding extra dimension                                        
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
                                         for state_sentence in t_state:
                                             total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence)
-                                    sim = total_sim.item()/(len(instruction_vector)*len(t_state))
+                                            dim_count+=1
+                                    #print("Observation: ", str_state)
+                                    #print("Tensor check: ", t_state.size(), " --- ", instruction_vector.size(), " --- ", feedback_layer.size())
+                                    #print("Sim result: ", total_sim.item(), '---', dim_count)
+                                    
+                                    sim = 0 if dim_count==0 else total_sim.item()/dim_count
                                     if sim > max_sim:
                                         max_sim  = sim
                                         sub_goal_max = obs_state
                                         sub_goal_max_t = t_state
                                     if sim >= self.sim_threshold:
                                         sub_goal = obs_state # Sub-Goal code
+                                        sub_goal_t = t_state
                                         sub_goal_list.append(sub_goal)
                 
                                 # OR if none above threshold matching max sim
@@ -247,11 +256,13 @@ class HeliosSearch:
                                         # ---
                                         total_sim = 0
                                         # Average sim across each sentence in instruction vs state
-                                        for i,instr_sentence in enumerate(instruction_vector):
-                                            feedback_layer_sent = feedback_layer[i]
+                                        dim_count = 0
+                                        for idx,instr_sentence in enumerate(instruction_vector):
+                                            feedback_layer_sent = feedback_layer[idx]
                                             for state_sentence in t_state:
-                                                total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence) 
-                                        sim = total_sim.item()/(len(instruction_vector)*len(t_state))
+                                                total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence)
+                                                dim_count+=1
+                                        sim = 0 if dim_count==0 else total_sim.item()/dim_count
                                         if sim >= (max_sim):
                                             sub_goal_list.append(obs_state)
 
@@ -281,6 +292,9 @@ class HeliosSearch:
                                     print("Full list of matching states...",)
                                     for s_g in sub_goal_list:
                                         print(self.observed_states[s_g], ": ", s_g)
+                                    print("")
+                                    print("Tensor check: Size of Instruction vs Best match: ", instruction_vector.size(), " --- ", sub_goal_t.size())
+                                    print("")
                                     feedback = input("-- Does this match the expectation instruction outcome? (Y/N)")
                                     feedback_count+=1 
                                 else:
@@ -308,11 +322,13 @@ class HeliosSearch:
                                             feedback_layer[idx] = torch.add(feedback_layer_sent, self.feedback_increment*(torch.sub(instr_sentence, sentence))) 
                                     total_sim = 0
                                     # Average sim across each sentence in instruction vs state
+                                    dim_count = 0
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
-                                        for state_sentence in sub_goal_t:
+                                        for state_sentence in t_state:
                                             total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence)
-                                    sim = total_sim.item()/(len(instruction_vector)*len(t_state))
+                                            dim_count+=1
+                                    sim = 0 if dim_count==0 else total_sim.item()/dim_count
                                     sim_delta = sim-max_sim
                                     print("--- Change in sim results with POSITIVE reinforcement of correct state match =", sim_delta)
                                     print("--- New Sim Value = ",  sim)
@@ -323,11 +339,13 @@ class HeliosSearch:
                                             feedback_layer[idx] = torch.sub(feedback_layer_sent, self.feedback_increment*(torch.sub(instr_sentence, sentence)))
                                     total_sim = 0
                                     # Average sim across each sentence in instruction vs state
+                                    dim_count = 0
                                     for idx,instr_sentence in enumerate(instruction_vector):
                                         feedback_layer_sent = feedback_layer[idx]
-                                        for state_sentence in sub_goal_t:
+                                        for state_sentence in t_state:
                                             total_sim+=self.cos(torch.add(state_sentence, feedback_layer_sent), instr_sentence)
-                                    sim = total_sim.item()/(len(instruction_vector)*len(t_state))
+                                            dim_count+=1
+                                    sim = 0 if dim_count==0 else total_sim.item()/dim_count
                                     sim_delta = sim-max_sim
                                     print("--- Change in sim results with NEGATIVE reinforcement for NO MATCH =", sim_delta)
                                     sub_goal = None
