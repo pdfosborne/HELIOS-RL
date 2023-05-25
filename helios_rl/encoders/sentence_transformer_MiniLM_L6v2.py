@@ -23,12 +23,15 @@ class LanguageEncoder(StateEncoder):
 
     def encode(self, state: List[str], legal_actions:list = None, episode_action_history:list = None, 
                indexed: bool = False) -> Tensor:
-        if (len(state) == 0):
+        
+        
+        # I think typing is overriding the input type anyway -> need to ensure sentences are split up
+        if type(state) == type(''):
+            state = state.split(".") 
+            state = [s for s in state if s.strip()]
+        elif (len(state) == 0):
             state = [""]
-            
-        if type(state) != type(list('')):
-            state = list(state)
-            
+                
         to_encode = [sent for sent in state if sent not in LanguageEncoder._cached_enc]
         if (to_encode):
             encoded = self.sentence_model.encode(to_encode, convert_to_tensor=True)
