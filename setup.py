@@ -1,8 +1,8 @@
 from distutils.core import setup
 
 setup(
-    name='HELIOS-RL-Test',
-    version='0.4.32',
+    name='helios-rl',
+    version='1.0.3',
     packages=[
         'helios_rl', 
         'helios_rl.adapters', 
@@ -24,5 +24,5 @@ setup(
         'scipy',
         'torch',
         'sentence-transformers'
-    ]
+    ] 
 )

@@ -208,7 +208,18 @@ class HeliosOptimize:
                             start = str(env_start).split(".")[0]
                             i=0
                             while True:
-                                if start in self.known_instructions_dict[(agent_type+'_'+adapter)]:
+                                # Only allow insutrction up until total limi
+                                # - Prevents it being given more episodes than flat
+                                # - Prevents cyclic instruction paths
+                                if int(number_training_episodes*self.instruction_episode_ratio)<=(number_training_episodes-total_instr_episodes):
+                                    # Override with trained agent if goal seen previously
+                                    if goal in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
+                                        live_env.agent = self.trained_agents[str(agent_type) + '_' + str(adapter)][goal].clone()
+                                        # Reset exploration parameter between seeds so to not get 'trapped'
+                                        live_env.agent.exploration_parameter_reset()
+                                    break
+                                
+                                elif start in self.known_instructions_dict[(agent_type+'_'+adapter)]:
                                     i+=1
                                     max_count = 0
                                     for end in self.known_instructions_dict[(agent_type+'_'+adapter)][start]:
@@ -308,7 +319,18 @@ class HeliosOptimize:
                         while True:
                             i+=1
                             max_count = 0
-                            if start in self.known_instructions_dict[(agent_type+'_'+adapter)]:
+                            # Only allow insutrction up until total limi
+                            # - Prevents it being given more episodes than flat
+                            # - Prevents cyclic instruction paths
+                            if int(number_training_episodes*self.instruction_episode_ratio)<=(number_training_episodes-total_instr_episodes):
+                                # Override with trained agent if goal seen previously
+                                if goal in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
+                                    live_env.agent = self.trained_agents[str(agent_type) + '_' + str(adapter)][goal].clone()
+                                    # Reset exploration parameter between seeds so to not get 'trapped'
+                                    live_env.agent.exploration_parameter_reset()
+                                break
+                            
+                            elif start in self.known_instructions_dict[(agent_type+'_'+adapter)]:
                                 for end in self.known_instructions_dict[(agent_type+'_'+adapter)][start]:
                                     if self.known_instructions_dict[(agent_type+'_'+adapter)][start][end] > max_count:
                                         max_count = self.known_instructions_dict[(agent_type+'_'+adapter)][start][end]

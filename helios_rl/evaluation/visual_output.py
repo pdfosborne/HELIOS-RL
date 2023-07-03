@@ -86,7 +86,7 @@ class VisualOutput:
                 ci_L=np.mean(window_reward)
                 ci_U=np.mean(window_reward)
             else:
-                ci_L, ci_U = st.t.interval(alpha=0.95, df=len(window_reward)-1, loc=np.mean(window_reward), scale=st.sem(window_reward))
+                ci_L, ci_U = st.t.interval(confidence=0.95, df=len(window_reward)-1, loc=np.mean(window_reward), scale=st.sem(window_reward))
 
             reward_delta.append(mean)
             ci_L_lst.append(ci_L)
@@ -149,7 +149,7 @@ class VisualOutput:
                 ci_L=np.mean(window_reward)
                 ci_U=np.mean(window_reward)
             else:
-                ci_L, ci_U = st.t.interval(alpha=0.95, df=len(window_reward)-1, loc=np.mean(window_reward), scale=st.sem(window_reward))
+                ci_L, ci_U = st.t.interval(confidence=0.95, df=len(window_reward)-1, loc=np.mean(window_reward), scale=st.sem(window_reward))
 
             reward_delta.append(mean)
             ci_L_lst.append(ci_L)
@@ -400,7 +400,7 @@ class VisualOutput:
                 ci_L=np.mean(window_reward)
                 ci_U=np.mean(window_reward)
             else:
-                ci_L, ci_U = st.t.interval(alpha=0.95, df=len(window_reward)-1, loc=np.mean(window_reward), scale=st.sem(window_reward))
+                ci_L, ci_U = st.t.interval(confidence=0.95, df=len(window_reward)-1, loc=np.mean(window_reward), scale=st.sem(window_reward))
 
             reward_delta.append(mean)
             ci_L_lst.append(ci_L)
