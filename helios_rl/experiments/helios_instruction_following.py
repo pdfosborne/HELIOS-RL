@@ -322,7 +322,7 @@ class HeliosOptimize:
                             # Only allow insutrction up until total limi
                             # - Prevents it being given more episodes than flat
                             # - Prevents cyclic instruction paths
-                            if int(number_training_episodes*self.instruction_episode_ratio)<=(number_training_episodes-total_instr_episodes):
+                            if int(number_training_episodes*self.instruction_episode_ratio)>=(number_training_episodes-total_instr_episodes):
                                 # Override with trained agent if goal seen previously
                                 if goal in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
                                     live_env.agent = self.trained_agents[str(agent_type) + '_' + str(adapter)][goal].clone()
