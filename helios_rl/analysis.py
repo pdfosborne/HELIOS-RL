@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import multiprocessing
 import os
 
 import warnings
@@ -14,6 +14,7 @@ class Analysis:
     """Calls the Local Environment function and produces analysis reports & figures."""
     def __init__(self, window_size) -> None:
         self.window_size = window_size
+        self.timeout = 10
     
     # Training Plots
     def train_report(self, training_results:pd.DataFrame(), save_dir:str, show_figures:str):
@@ -31,7 +32,8 @@ class Analysis:
         VisualAnalysis.number_actions_graph()
         VisualAnalysis.number_actions_dist_graph()
         VisualAnalysis.runtime_per_episode_graph()
-        VisualAnalysis.runtime_dist_graph()
+        # Catch runtime issues for dist plot
+        #VisualAnalysis.runtime_dist_graph()
         
         TableOutput = TabularOutput(training_results, save_dir)
         TableOutput.save_results()
@@ -206,7 +208,8 @@ class Analysis:
         VisualAnalysis.number_actions_graph()
         VisualAnalysis.number_actions_dist_graph()
         VisualAnalysis.runtime_per_episode_graph()
-        VisualAnalysis.runtime_dist_graph()
+        # Catch runtime issues for dist plot
+        #VisualAnalysis.runtime_dist_graph()
 
         TableOutput = TabularOutput(test_results, save_dir)
         TableOutput.save_results()
