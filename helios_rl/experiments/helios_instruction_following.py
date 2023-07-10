@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import json
+import random
 
 # ------ Experiment Import --------------------------------------
 from helios_rl.analysis import Analysis
@@ -15,14 +16,16 @@ AGENT_TYPES = {
     "Qlearntab": TableQLearningAgent,
     "Neural_Q": NeuralQLearningAgent,
     "Neural_Q_2": NeuralQLearningAgent,
-    "Neural_Q_language": NeuralQLearningAgent
+    "Neural_Q_language": NeuralQLearningAgent,
+    "Random": random
 }
 
 PLAYER_PARAMS = {
     "Qlearntab": ["alpha", "gamma", "epsilon"],
     "Neural_Q": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"],
     "Neural_Q_2": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"],
-    "Neural_Q_language": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"]
+    "Neural_Q_language": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"],
+    "Random": []
 }
 
 # This is the main run functions for HELIOS to be imported
@@ -37,7 +40,8 @@ PLAYER_PARAMS = {
 class HeliosOptimize:
     def __init__(self, Config:dict, LocalConfig:dict, Environment, 
                  save_dir:str, show_figures:str, window_size:float,
-                 instruction_path: dict, predicted_path: dict=None, instruction_episode_ratio:float=0.1):
+                 instruction_path: dict, predicted_path: dict=None, instruction_episode_ratio:float=0.1,
+                 instruction_chain:bool=False, instruction_chain_how:str='None'):
         self.ExperimentConfig = Config
         self.LocalConfig = LocalConfig
         
@@ -98,6 +102,15 @@ class HeliosOptimize:
         self.analysis = Analysis(window_size=window_size)
         # Defines the number of episodes used for sub-instructions
         self.instruction_episode_ratio = instruction_episode_ratio
+        
+        # New - instruction chaining
+        # - i.e. when learning the env should not reset to original start position
+        # - instead, next instruction starts from where previous ended
+        self.instruction_chain = instruction_chain
+        if instruction_chain_how == 'None':
+            self.instruction_chain_how = 'First'
+        else:
+            self.instruction_chain_how = instruction_chain_how
         
     def train(self):
         if not os.path.exists(self.save_dir):
@@ -316,6 +329,7 @@ class HeliosOptimize:
                         i=0
                         total_instr_episodes = 0
                         instr_results = None
+                        prior_instr = None
                         while True:
                             i+=1
                             max_count = 0
@@ -349,6 +363,22 @@ class HeliosOptimize:
                                     live_env.agent = self.trained_agents[str(agent_type) + '_' + str(adapter)][instr].clone()
                                 # TODO: ADOPT AGENT OF MOST SIMILAR POLICY
                                 # ---
+                                # New: Allow env to start from prior instr end
+                                if self.instruction_chain:
+                                    if prior_instr:
+                                        # Select first env position from known sub-goal list
+                                        if self.instruction_chain_how == 'first':
+                                            env_sg_start = self.instruction_path[prior_instr][agent_type+'_'+adapter]['sub_goal'][0]
+                                        elif self.instruction_chain_how == 'random':
+                                            env_sg_start = random.choice(self.instruction_path[prior_instr][agent_type+'_'+adapter]['sub_goal'])
+                                        elif self.instruction_chain_how == 'exact':
+                                            try:
+                                                env_sg_start = live_env.sub_goal_end
+                                            except:
+                                                print("ERROR: To use the exact instruction chain, the environment must include the '.sub_goal_end' attribute.")
+                                        
+                                        live_env.start_obs = env_sg_start
+                                    
                                 sub_goal = self.instruction_path[instr][agent_type+'_'+adapter]['sub_goal']
                                 live_env.sub_goal = sub_goal
                                 live_env.agent.exploration_parameter_reset()
@@ -369,6 +399,7 @@ class HeliosOptimize:
                                 temp_agent_store[instr][setup_num] = {'Return':Return,'agent':live_env.agent.clone()}
                                 # ---
                                 start = end
+                                prior_instr = instr
                                 # New: Dont reset results for each sub-instr so we show the training results with this included
                                 #live_env.results.reset() # Force reset so we don't get overlapping outputs
                                 instr_results =  live_env.results.copy()
@@ -382,13 +413,14 @@ class HeliosOptimize:
                                         live_env.agent.exploration_parameter_reset()
                                 break
                         # train for entire path 
-                        #live_env.start_obs = env_start
+                        if self.instruction_chain:
+                            live_env.start_obs = env_start
                         # Number of episodes used reduced by those used for instructions (lower bounded)
                         if (number_training_episodes-total_instr_episodes)<int(number_training_episodes*self.instruction_episode_ratio):
                             if int(number_training_episodes*self.instruction_episode_ratio) < 10:
-                                live_env.num_train_epispdes = 10
+                                live_env.num_train_episodes = 10
                             else:
-                                live_env.num_train_epispdes = int(number_training_episodes*self.instruction_episode_ratio)
+                                live_env.num_train_episodes = int(number_training_episodes*self.instruction_episode_ratio)
                         else:
                             live_env.num_train_episodes = number_training_episodes - total_instr_episodes
                         # Remove sub-goal

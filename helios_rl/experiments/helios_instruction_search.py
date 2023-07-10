@@ -16,20 +16,23 @@ from helios_rl.experiments.helios_instr_input import HeliosInput
 from helios_rl.agents.agent_abstract import Agent, QLearningAgent
 from helios_rl.agents.table_q_agent import TableQLearningAgent
 from helios_rl.agents.neural_q_agent import NeuralQLearningAgent
+from helios_rl.agents.random_agent import random
 
 # TODO: Enable any number of the same agent types with varying parameters
 AGENT_TYPES = {
     "Qlearntab": TableQLearningAgent,
     "Neural_Q": NeuralQLearningAgent,
     "Neural_Q_2": NeuralQLearningAgent,
-    "Neural_Q_language": NeuralQLearningAgent
+    "Neural_Q_language": NeuralQLearningAgent,
+    "Random": random
 }
 
 PLAYER_PARAMS = {
     "Qlearntab": ["alpha", "gamma", "epsilon"],
     "Neural_Q": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"],
     "Neural_Q_2": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"],
-    "Neural_Q_language": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"]
+    "Neural_Q_language": ["input_type", "input_size", "sent_hidden_dim", "hidden_dim", "num_hidden", "sequence_size", "memory_size"],
+    "Random":[]
 }
 
 # TODO use encoder defined by config not manual import
@@ -53,7 +56,7 @@ class HeliosSearch:
         self.LocalConfig = LocalConfig
 
         self.env = Environment
-        self.setup_info:dict = self.ExperimentConfig['data'] | vars(self.LocalConfig) # TODO: configs aren't consistent formatting 
+        self.setup_info:dict = self.ExperimentConfig['data'] | self.LocalConfig['data']  
         self.training_setups: dict = {}
 
         save_dir_extra = save_dir.split("/")[-1]
