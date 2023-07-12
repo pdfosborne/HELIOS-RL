@@ -16,7 +16,7 @@ from helios_rl.experiments.helios_instr_input import HeliosInput
 from helios_rl.agents.agent_abstract import Agent, QLearningAgent
 from helios_rl.agents.table_q_agent import TableQLearningAgent
 from helios_rl.agents.neural_q_agent import NeuralQLearningAgent
-from helios_rl.agents.random_agent import random
+from helios_rl.agents.random_agent import RandomAgent
 
 # TODO: Enable any number of the same agent types with varying parameters
 AGENT_TYPES = {
@@ -24,7 +24,7 @@ AGENT_TYPES = {
     "Neural_Q": NeuralQLearningAgent,
     "Neural_Q_2": NeuralQLearningAgent,
     "Neural_Q_language": NeuralQLearningAgent,
-    "Random": random
+    "Random": RandomAgent
 }
 
 PLAYER_PARAMS = {

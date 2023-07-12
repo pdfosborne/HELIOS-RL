@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='helios-rl',
-    version='1.0.16',
+    version='1.0.19',
     packages=[
         'helios_rl', 
         'helios_rl.adapters', 
@@ -21,7 +21,7 @@ setup(
         'pandas',
         'matplotlib',
         'seaborn',
-        'scipy',
+        'scipy>=1.10.1',
         'torch',
         'sentence-transformers'
     ] 
