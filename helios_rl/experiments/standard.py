@@ -239,7 +239,7 @@ class Experiment:
                 env = self.env(test_setup_info)
                 # ---
                 start_obs = env.start_obs
-                goal = str(start_obs) + "_" + "GOAL"
+                goal = str(start_obs).split(".")[0] + "_" + "GOAL"
                 print("Flat agent Goal: ", goal)
                 # Override with trained agent if goal seen previously
                 if goal in self.trained_agents[test_setup_info['agent_type']+ '_' +test_setup_info['adapter_select']]:
