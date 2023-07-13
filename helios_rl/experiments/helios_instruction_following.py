@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import json
 import random
 
@@ -73,29 +74,65 @@ class HeliosOptimize:
                 self.testing_path = predicted_path
         else:
             self.instruction_path = instruction_path
-            self.testing_path = False
+            self.testing_path = False   
         self.known_instructions = list(self.instruction_path.keys())
         self.known_instructions_dict = {}
+        # Extract sub-goal completion for each instruction based on search results
+        agent_adapter_i = None
         for instr in self.known_instructions:
             start = instr.split("---")[0]
             end = instr.split("---")[1]
-
             for n, agent_type in enumerate(self.setup_info['agent_select']):
                 adapter = self.setup_info["adapter_select"][n]
-                if (agent_type+'_'+adapter) not in self.known_instructions_dict:
-                        self.known_instructions_dict[(agent_type+'_'+adapter)] = {}
-
-                if (agent_type+'_'+adapter) in self.instruction_path[instr]:
-                    count = self.instruction_path[instr][(agent_type+'_'+adapter)]['count']
-                    if start not in self.known_instructions_dict[(agent_type+'_'+adapter)]:
-                        self.known_instructions_dict[(agent_type+'_'+adapter)][start] = {}
-                        if end not in self.known_instructions_dict[(agent_type+'_'+adapter)][start]:
-                            self.known_instructions_dict[(agent_type+'_'+adapter)][start][end] = count
-
-
+                agent_adapter = agent_type+'_'+adapter
+                if agent_adapter not in self.known_instructions_dict:
+                    self.known_instructions_dict[agent_adapter] = {}
+                
+                if agent_adapter in self.instruction_path[instr]:
+                    count = self.instruction_path[instr][agent_adapter]['count']
+                    if start not in self.known_instructions_dict[agent_adapter]:
+                        self.known_instructions_dict[agent_adapter][start] = {}
+                        if end not in self.known_instructions_dict[agent_adapter][start]:
+                            self.known_instructions_dict[agent_adapter][start][end] = count
+                else:
+                    # Supplement alternative search agent for this
+                    # - we need it to match agent_adapter lookup for later calls so simply copies the search knowledge
+                    # Search agent+adapter is now independent from optimization agent, 
+                    #  - will default to match 
+                    #  - but if optimization agent not seen in search then alternative must be used
+                    agent_adapter_list = {}
+                    i = 0
+                    for item in self.instruction_path[instr]:
+                        agent_adapter_list[str(i)] = item
+                        i+=1
+                    
+                    if (i>1)&(agent_adapter_i is None):
+                        print("\n Agent + Adapter not used in instruction search, please select the search agent:")
+                        print(agent_adapter_list)
+                        agent_adapter_i = input("\t - Select the id number of the default search agent+adapter you wish to use:    ")
+                    elif (i>1)&(agent_adapter_i is not None):
+                        agent_adapter_i = agent_adapter_i
+                    else:
+                        print("Only one agent used in instruction search, defaulting to this.")
+                        print(agent_adapter_list)
+                        agent_adapter_i = '0'
+                    agent_adapter_copy = agent_adapter_list[agent_adapter_i]
+                    # Copy knowledge of chosen search agent+adapter
+                    # - Instruction path to define sub_goal list
+                    self.instruction_path[instr][agent_adapter] = self.instruction_path[instr][agent_adapter_copy].copy()
+                    # - Known instructions dict to define meta-MDP planner
+                    count = self.instruction_path[instr][agent_adapter_copy]['count']
+                    if start not in self.known_instructions_dict[agent_adapter]:
+                        self.known_instructions_dict[agent_adapter][start] = {}
+                        if end not in self.known_instructions_dict[agent_adapter][start]:
+                            self.known_instructions_dict[agent_adapter][start][end] = count
+                    
         print("-----")
         print("Known human instruction inputs. ")
         print(self.known_instructions_dict)
+        print(" - ")
+        for instr in self.instruction_path:
+            print("\n \t - ", instr, " -> ", list(self.instruction_path[instr].keys()))
         # new - store agents cross training repeats for completing the same start-end goal
         self.trained_agents: dict = {}
         self.num_training_seeds = self.setup_info['number_training_seeds']
@@ -108,7 +145,7 @@ class HeliosOptimize:
         # - instead, next instruction starts from where previous ended
         self.instruction_chain = instruction_chain
         if instruction_chain_how == 'None':
-            self.instruction_chain_how = 'First'
+            self.instruction_chain_how = 'Random'
         else:
             self.instruction_chain_how = instruction_chain_how
         
@@ -330,6 +367,7 @@ class HeliosOptimize:
                         total_instr_episodes = 0
                         instr_results = None
                         prior_instr = None
+                        multi_sub_goal = {} # New multi-goal option -> needs to be defined in env
                         while True:
                             i+=1
                             max_count = 0
@@ -367,17 +405,34 @@ class HeliosOptimize:
                                 if self.instruction_chain:
                                     if prior_instr:
                                         # Select first env position from known sub-goal list
-                                        if self.instruction_chain_how == 'first':
+                                        if self.instruction_chain_how.lower() == 'first':
                                             env_sg_start = self.instruction_path[prior_instr][agent_type+'_'+adapter]['sub_goal'][0]
-                                        elif self.instruction_chain_how == 'random':
+                                        elif self.instruction_chain_how.lower() == 'random':
                                             env_sg_start = random.choice(self.instruction_path[prior_instr][agent_type+'_'+adapter]['sub_goal'])
-                                        elif self.instruction_chain_how == 'exact':
+                                        elif self.instruction_chain_how.lower() == 'exact':
                                             try:
                                                 env_sg_start = live_env.sub_goal_end
                                             except:
-                                                print("ERROR: To use the exact instruction chain, the environment must include the '.sub_goal_end' attribute.")
+                                                print("ERROR: To use the EXACT instruction chain, the environment must include the '.sub_goal_end' attribute.")
+                                        elif (self.instruction_chain_how.lower() == 'continuous')|(self.instruction_chain_how.lower() == 'cont'):
+                                            # Env start position is default (i.e. reset)
+                                            env_sg_start = None
+                                            # Define multi-sub-goals
+                                            # - Scale prior instruction down based on current path by r = 1/x
+                                            # - Reward override if same instr seen later to prevent cyclic loops that don't complete episode 
+                                            if prior_instr not in multi_sub_goal:
+                                                multi_sub_goal[prior_instr] = {}
+                                                multi_sub_goal[prior_instr]['sub_goal'] = self.instruction_path[instr][agent_type+'_'+adapter]['sub_goal']
+                                            multi_sub_goal[prior_instr]['reward_scale'] = np.round(1/i) # 1/2, 1/3, 1/4, ...
+                                                
+                                            try:
+                                                # This doesn't supercede .sub_goal so need both defined
+                                                live_env.multi_sub_goal = multi_sub_goal
+                                            except:
+                                                print("ERROR: To use CONTINUOUS instruction chain, the environment must include the '.multi_sub_gial' attribute.")
                                         
-                                        live_env.start_obs = env_sg_start
+                                        if env_sg_start:
+                                            live_env.start_obs = env_sg_start
                                     
                                 sub_goal = self.instruction_path[instr][agent_type+'_'+adapter]['sub_goal']
                                 live_env.sub_goal = sub_goal
