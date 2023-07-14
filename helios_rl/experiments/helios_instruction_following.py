@@ -136,7 +136,8 @@ class HeliosOptimize:
         # new - store agents cross training repeats for completing the same start-end goal
         self.trained_agents: dict = {}
         self.num_training_seeds = self.setup_info['number_training_seeds']
-        self.test_agent_type = 'Best'
+        # new - config input defines the re-use of trained agents for testing: 'best' or 'all'
+        self.test_agent_type = self.setup_info['test_agent_type']
         self.analysis = Analysis(window_size=window_size)
         # Defines the number of episodes used for sub-instructions
         self.instruction_episode_ratio = instruction_episode_ratio
@@ -567,30 +568,64 @@ class HeliosOptimize:
             print("Testing results for trained agents in saved setup configuration:")
             number_training_repeats = test_setup_info['number_test_repeats']
             agent_adapter = test_setup_info['agent_type'] + "_" + test_setup_info['adapter_select']
-
-            for testing_repeat in range(0, test_setup_info['number_test_repeats']):  
+            
+            # Only use the trained agent with best return
+            if self.test_agent_type.lower()=='best':
+                for testing_repeat in range(0, test_setup_info['number_test_repeats']):  
+                    # Re-init env for testing
+                    env = self.env(test_setup_info)
+                    # ---
+                    start_obs = env.start_obs
+                    goal = str(start_obs).split(".")[0] + "---" + "GOAL"
+                    print("Flat agent Goal: ", goal)
+                    # Override with trained agent if goal seen previously
+                    if goal in self.trained_agents[test_setup_info['agent_type']+ '_' +test_setup_info['adapter_select']]:
+                        print("Trained agent available for testing.")
+                        env.agent = self.trained_agents[test_setup_info['agent_type']+'_'+test_setup_info['adapter_select']][goal]
+                    else:
+                        print("NO agent available for testing position.")
+                    env.agent.epsilon = 0 # Remove random actions
+                    # ---
+                    # Testing generally is the agents replaying on the testing ENV
+                    testing_results = env.episode_loop() 
+                    test_save_dir = (self.save_dir+'/'+agent_adapter+'__testing_results_'+str(goal).split("/")[0]+"_"+str(testing_repeat) )
+                    if not os.path.exists(test_save_dir):
+                        os.mkdir(test_save_dir)
+                    # Produce training report with Analysis.py
+                    Return = self.analysis.test_report(testing_results, test_save_dir, self.show_figures)
+                    
+            # Re-apply all trained agents with fixed policy
+            elif self.test_agent_type.lower()=='all':
+                # All trained agents are used:
+                # - Repeats can be used to vary start position
+                # - But assumed environment is deterministic otherwise
                 # Re-init env for testing
-                env = self.env(test_setup_info)
-                # ---
-                start_obs = env.start_obs
-                goal = str(start_obs).split(".")[0] + "---" + "GOAL"
-                print("Flat agent Goal: ", goal)
-                # Override with trained agent if goal seen previously
-                if goal in self.trained_agents[test_setup_info['agent_type']+ '_' +test_setup_info['adapter_select']]:
-                    print("Trained agent available for testing.")
-                    env.agent = self.trained_agents[test_setup_info['agent_type']+'_'+test_setup_info['adapter_select']][goal]
-                else:
-                    print("NO agent available for testing position.")
-                env.agent.epsilon = 0 # Remove random actions
-                # ---
-                # Testing generally is the agents replaying on the testing ENV
-                testing_results = env.episode_loop() 
-                test_save_dir = (self.save_dir+'/'+agent_adapter+'__testing_results_'+str(goal).split("/")[0]+"_"+str(testing_repeat) )
-                if not os.path.exists(test_save_dir):
-                    os.mkdir(test_save_dir)
-                # Produce training report with Analysis.py
-                Return = self.analysis.test_report(testing_results, test_save_dir, self.show_figures)
+                for testing_repeat in range(0, test_setup_info['number_test_repeats']):
+                    env = self.env(test_setup_info)
+                    # ---
+                    start_obs = env.start_obs
+                    goal = str(start_obs).split(".")[0] + "---" + "GOAL"
+                    print("Flat agent Goal: ", goal)
+                    # Override with trained agent if goal seen previously
+                    if goal in self.trained_agents[test_setup_info['agent_type']+ '_' +test_setup_info['adapter_select']]:
+                        print("Trained agents available for testing.")
+                        all_agents = self.trained_agents[test_setup_info['agent_type']+'_'+test_setup_info['adapter_select']][goal]
+                    else:
+                        print("NO agent available for testing position.")
+                    
+                    for ag,agent in enumerate(all_agents):
+                        env.reset(start_obs)
+                        env.agent = agent
+                        env.agent.epsilon = 0 # Remove random actions
+                        # ---
+                        # Testing generally is the agents replaying on the testing ENV
+                        testing_results = env.episode_loop() 
+                        test_save_dir = (self.save_dir+'/'+agent_adapter+'__testing_results_'+str(goal).split("/")[0]+"_repeat-"+str(testing_repeat)+"_agent-"+str(ag))
+                        if not os.path.exists(test_save_dir):
+                            os.mkdir(test_save_dir)
+                        # Produce training report with Analysis.py
+                        Return = self.analysis.test_report(testing_results, test_save_dir, self.show_figures)
 
         # Path is the experiment save dir + the final instruction
-        if number_training_repeats>1:
+        if (number_training_repeats>1)|(self.test_agent_type.lower()=='all'):
             self.analysis.testing_variance_report(self.save_dir, self.show_figures)

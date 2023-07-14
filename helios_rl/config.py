@@ -48,6 +48,7 @@ class ExperimentConfig(Config):
         # Testing repeated
         self.number_test_episodes = self.data.get("number_test_episodes", 100)
         self.number_test_repeats = self.data.get("number_test_repeats", 5)
+        self.test_agent_type = self.data.get("test_agent_type","best")
 
         # Tab Q Agent parameters
         self.alpha = self.data.get("alpha", [0.05])
