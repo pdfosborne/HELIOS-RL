@@ -136,6 +136,7 @@ class HeliosOptimize:
         # new - store agents cross training repeats for completing the same start-end goal
         self.trained_agents: dict = {}
         self.num_training_seeds = self.setup_info['number_training_seeds']
+        self.test_agent_type = 'Best'
         self.analysis = Analysis(window_size=window_size)
         # Defines the number of episodes used for sub-instructions
         self.instruction_episode_ratio = instruction_episode_ratio
@@ -411,7 +412,10 @@ class HeliosOptimize:
                                             env_sg_start = random.choice(self.instruction_path[prior_instr][agent_type+'_'+adapter]['sub_goal'])
                                         elif self.instruction_chain_how.lower() == 'exact':
                                             try:
-                                                env_sg_start = live_env.sub_goal_end
+                                                if live_env.sub_goal_end:
+                                                    env_sg_start = live_env.sub_goal_end
+                                                else:
+                                                    env_sg_start = random.choice(self.instruction_path[prior_instr][agent_type+'_'+adapter]['sub_goal'])
                                             except:
                                                 print("ERROR: To use the EXACT instruction chain, the environment must include the '.sub_goal_end' attribute.")
                                         elif (self.instruction_chain_how.lower() == 'continuous')|(self.instruction_chain_how.lower() == 'cont'):
@@ -423,7 +427,7 @@ class HeliosOptimize:
                                             if prior_instr not in multi_sub_goal:
                                                 multi_sub_goal[prior_instr] = {}
                                                 multi_sub_goal[prior_instr]['sub_goal'] = self.instruction_path[instr][agent_type+'_'+adapter]['sub_goal']
-                                            multi_sub_goal[prior_instr]['reward_scale'] = np.round(1/i) # 1/2, 1/3, 1/4, ...
+                                            multi_sub_goal[prior_instr]['reward_scale'] = np.round(1/i, 4) # 1/2, 1/3, 1/4, ...
                                                 
                                             try:
                                                 # This doesn't supercede .sub_goal so need both defined
@@ -516,18 +520,30 @@ class HeliosOptimize:
                 for instr in temp_agent_store:
                     start_repeat_num = list(temp_agent_store[instr].keys())[0]
                     end_repeat_num = list(temp_agent_store[instr].keys())[-1]
-                    # Only save the best agent from repeated training
-                    best_return = temp_agent_store[instr][start_repeat_num]['Return']
-                    best_agent = temp_agent_store[instr][start_repeat_num]['agent']
-                    for repeat in range(start_repeat_num+1,end_repeat_num+1):
-                        if temp_agent_store[instr][repeat]['Return']>best_return:
-                            best_return = temp_agent_store[instr][repeat]['Return']
-                            best_agent = temp_agent_store[instr][repeat]['agent']
-            
-                    if instr not in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
-                        self.trained_agents[str(agent_type) + '_' + str(adapter)][instr] = {}
-                    self.trained_agents[str(agent_type) + '_' + str(adapter)][instr] = best_agent      
+
+                    if self.test_agent_type.lower() == 'best':
+                        # Only save the best agent from repeated training
+                        best_return = temp_agent_store[instr][start_repeat_num]['Return']
+                        best_agent = temp_agent_store[instr][start_repeat_num]['agent']
+                        for repeat in range(start_repeat_num+1,end_repeat_num+1):
+                            if temp_agent_store[instr][repeat]['Return']>best_return:
+                                best_return = temp_agent_store[instr][repeat]['Return']
+                                best_agent = temp_agent_store[instr][repeat]['agent']
                 
+                        if instr not in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
+                            self.trained_agents[str(agent_type) + '_' + str(adapter)][instr] = {}
+                        self.trained_agents[str(agent_type) + '_' + str(adapter)][instr] = best_agent      
+                    elif self.test_agent_type.lower() == 'all':
+                        all_agents = []
+                        for repeat in range(start_repeat_num+1,end_repeat_num+1):
+                            agent = temp_agent_store[instr][repeat]['agent']
+                            all_agents.append(agent)
+                            
+                        if instr not in self.trained_agents[str(agent_type) + '_' + str(adapter)]:
+                            self.trained_agents[str(agent_type) + '_' + str(adapter)][instr] = {}
+                        self.trained_agents[str(agent_type) + '_' + str(adapter)][instr] = all_agents
+
+                                        
             # Store last train_setup_info as collection of observed states and experience sampling
             self.training_setups['Training_Setup_'+str(agent_type) + '_' + str(adapter)] = train_setup_info
         if (number_training_repeats>1)|(self.num_training_seeds):
